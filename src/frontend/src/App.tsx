@@ -5,6 +5,7 @@ import {
   ChevronDown,
   Crown,
   HelpCircle,
+  Image,
   LayoutDashboard,
   LogOut,
   Megaphone,
@@ -22,6 +23,7 @@ import UpgradeBanner from "./components/UpgradeBanner";
 import UpiPaymentBot from "./components/UpiPaymentBot";
 import { useTrialTimer } from "./hooks/useTrialTimer";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import FlyersPage from "./pages/FlyersPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
 import InventoryPage from "./pages/InventoryPage";
 import LandingPage from "./pages/LandingPage";
@@ -37,7 +39,8 @@ export type NavTab =
   | "analytics"
   | "marketing"
   | "integrations"
-  | "settings";
+  | "settings"
+  | "flyers";
 
 const navItems: { id: NavTab; label: string; icon: React.ReactNode }[] = [
   { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },
@@ -46,6 +49,7 @@ const navItems: { id: NavTab; label: string; icon: React.ReactNode }[] = [
   { id: "analytics", label: "Analytics", icon: <BarChart3 size={18} /> },
   { id: "marketing", label: "Marketing", icon: <Megaphone size={18} /> },
   { id: "integrations", label: "Integrations", icon: <Plug size={18} /> },
+  { id: "flyers", label: "Flyers", icon: <Image size={18} /> },
 ];
 
 const PLAN_LABELS: Record<string, string> = {
@@ -112,6 +116,8 @@ export default function App() {
         return <IntegrationsPage />;
       case "settings":
         return <SettingsPage />;
+      case "flyers":
+        return <FlyersPage />;
       default:
         return <OverviewPage setTab={setActiveTab} />;
     }
