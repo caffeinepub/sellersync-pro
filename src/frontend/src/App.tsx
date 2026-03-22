@@ -65,7 +65,6 @@ export default function App() {
     currentPlan,
   } = useTrialTimer();
 
-  // Handle Stripe redirect params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const payment = params.get("payment");
@@ -76,15 +75,12 @@ export default function App() {
       toast.success("🎉 Payment successful! Welcome to SellerSync Pro.", {
         duration: 6000,
       });
-      // Clean URL
-      const clean = window.location.pathname;
-      window.history.replaceState({}, document.title, clean);
+      window.history.replaceState({}, document.title, window.location.pathname);
     } else if (payment === "cancelled") {
       toast.error("Payment was cancelled. You can try again anytime.", {
         duration: 5000,
       });
-      const clean = window.location.pathname;
-      window.history.replaceState({}, document.title, clean);
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [subscribeFromStripe]);
 
@@ -118,9 +114,8 @@ export default function App() {
     <div
       className="flex h-screen w-full overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #08090C 0%, #0C0E14 100%)",
-        fontFamily:
-          "'Plus Jakarta Sans', 'Bricolage Grotesque', system-ui, sans-serif",
+        background: "linear-gradient(160deg, #08090E 0%, #0B0D14 100%)",
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
       }}
     >
       {/* Paywall */}
@@ -130,29 +125,29 @@ export default function App() {
 
       {/* Left Sidebar */}
       <aside
-        className="flex flex-col items-center py-6 gap-2"
+        className="flex flex-col items-center py-5 gap-1"
         style={{
           width: 60,
           minWidth: 60,
-          background: "#0A0C12",
-          borderRight: "1px solid rgba(245,158,11,0.1)",
+          background: "#08090E",
+          borderRight: "1px solid rgba(245,158,11,0.08)",
           flexShrink: 0,
           zIndex: 40,
-          position: "relative",
         }}
       >
         {/* Logo */}
         <div
-          className="mb-4 flex items-center justify-center rounded-xl"
+          className="mb-5 flex items-center justify-center rounded-xl"
           style={{
             width: 38,
             height: 38,
             background: "linear-gradient(135deg, #F59E0B, #D97706)",
-            boxShadow: "0 4px 16px rgba(245,158,11,0.35)",
+            boxShadow: "0 4px 20px rgba(245,158,11,0.3)",
           }}
         >
-          <Bot size={20} color="#0A0800" />
+          <Bot size={19} color="#0A0800" />
         </div>
+
         {navItems.map((item) => (
           <button
             type="button"
@@ -160,52 +155,45 @@ export default function App() {
             data-ocid={`nav.${item.id}_link`}
             onClick={() => setActiveTab(item.id)}
             title={item.label}
-            className="flex items-center justify-center rounded-xl transition-all duration-200"
-            style={{
-              width: 40,
-              height: 40,
-              background:
-                activeTab === item.id ? "rgba(245,158,11,0.15)" : "transparent",
-              color: activeTab === item.id ? "#F59E0B" : "#4A5568",
-              border:
-                activeTab === item.id
-                  ? "1px solid rgba(245,158,11,0.3)"
-                  : "1px solid transparent",
-            }}
+            className={`sidebar-nav-btn ${
+              activeTab === item.id
+                ? "sidebar-nav-btn--active"
+                : "sidebar-nav-btn--muted"
+            }`}
           >
             {item.icon}
           </button>
         ))}
+
         <div className="flex-1" />
+
+        {/* Bottom actions */}
         <button
           type="button"
           data-ocid="nav.settings_link"
           onClick={() => setActiveTab("settings")}
           title="Settings"
-          className="flex items-center justify-center rounded-xl"
-          style={{
-            width: 40,
-            height: 40,
-            color: activeTab === "settings" ? "#F59E0B" : "#4A5568",
-          }}
+          className={`sidebar-nav-btn ${
+            activeTab === "settings"
+              ? "sidebar-nav-btn--active"
+              : "sidebar-nav-btn--muted"
+          }`}
         >
-          <Settings size={18} />
+          <Settings size={17} />
         </button>
         <button
           type="button"
           title="Help"
-          className="flex items-center justify-center rounded-xl"
-          style={{ width: 40, height: 40, color: "#4A5568" }}
+          className="sidebar-nav-btn sidebar-nav-btn--muted"
         >
-          <HelpCircle size={18} />
+          <HelpCircle size={17} />
         </button>
         <button
           type="button"
           title="Logout"
-          className="flex items-center justify-center rounded-xl"
-          style={{ width: 40, height: 40, color: "#4A5568" }}
+          className="sidebar-nav-btn sidebar-nav-btn--muted"
         >
-          <LogOut size={18} />
+          <LogOut size={17} />
         </button>
       </aside>
 
@@ -215,14 +203,13 @@ export default function App() {
         <header
           className="flex items-center px-4 gap-2 flex-wrap"
           style={{
-            minHeight: 58,
+            minHeight: 56,
             paddingTop: 8,
             paddingBottom: 8,
-            background: "#0A0C12",
-            borderBottom: "1px solid rgba(245,158,11,0.1)",
+            background: "#08090E",
+            borderBottom: "1px solid rgba(245,158,11,0.08)",
             flexShrink: 0,
             zIndex: 30,
-            position: "relative",
           }}
         >
           {/* Brand */}
@@ -230,7 +217,7 @@ export default function App() {
             <span
               style={{
                 fontWeight: 800,
-                fontSize: 16,
+                fontSize: 15,
                 color: "#F1F5F9",
                 letterSpacing: "-0.5px",
                 fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
@@ -241,13 +228,13 @@ export default function App() {
             </span>
             <span
               style={{
-                fontSize: 11,
+                fontSize: 10,
                 color: "#0A0800",
                 fontWeight: 700,
                 background: "linear-gradient(135deg, #F59E0B, #D97706)",
                 padding: "2px 7px",
                 borderRadius: 999,
-                letterSpacing: "0.05em",
+                letterSpacing: "0.06em",
                 whiteSpace: "nowrap",
               }}
             >
@@ -255,29 +242,26 @@ export default function App() {
             </span>
           </div>
 
-          {/* Trial Banner (in header) — hidden on small screens */}
+          {/* Trial Banner */}
           {!isSubscribed && secondsLeft > 0 && (
-            <div
-              className="hidden md:flex"
-              style={{ flexShrink: 0, overflow: "hidden" }}
-            >
+            <div className="hidden md:flex" style={{ flexShrink: 0 }}>
               <TrialBanner secondsLeft={secondsLeft} />
             </div>
           )}
 
           <div className="flex-1" />
 
-          {/* Search — hidden on very small screens */}
+          {/* Search */}
           <div
             className="hidden sm:flex items-center gap-2 rounded-lg px-3"
             style={{
               background: "#0F1117",
-              border: "1px solid rgba(245,158,11,0.12)",
+              border: "1px solid rgba(255,255,255,0.07)",
               height: 34,
               flexShrink: 0,
             }}
           >
-            <Search size={13} color="#4A5568" />
+            <Search size={13} color="#3D4F63" />
             <input
               data-ocid="header.search_input"
               value={search}
@@ -289,7 +273,7 @@ export default function App() {
                 outline: "none",
                 fontSize: 12.5,
                 color: "#E2E8F0",
-                width: 140,
+                width: 145,
               }}
             />
           </div>
@@ -297,13 +281,13 @@ export default function App() {
           {/* Bell */}
           <button
             type="button"
-            className="relative flex items-center justify-center rounded-lg"
+            className="relative flex items-center justify-center rounded-lg transition-colors"
             style={{
               width: 34,
               height: 34,
               background: "#0F1117",
-              border: "1px solid rgba(245,158,11,0.12)",
-              color: "#4A5568",
+              border: "1px solid rgba(255,255,255,0.07)",
+              color: "#3D4F63",
               flexShrink: 0,
             }}
           >
@@ -324,10 +308,10 @@ export default function App() {
 
           {/* User chip */}
           <div
-            className="flex items-center gap-2 rounded-lg px-3"
+            className="flex items-center gap-2 rounded-lg px-2.5"
             style={{
               background: "#0F1117",
-              border: "1px solid rgba(245,158,11,0.12)",
+              border: "1px solid rgba(255,255,255,0.07)",
               height: 34,
               cursor: "pointer",
               flexShrink: 0,
@@ -350,13 +334,13 @@ export default function App() {
               className="hidden sm:flex flex-col"
               style={{ lineHeight: 1.2 }}
             >
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#F1F5F9" }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#E2E8F0" }}>
                 Admin
               </span>
               <span
                 style={{
                   fontSize: 10,
-                  color: isSubscribed ? "#F59E0B" : "#4A5568",
+                  color: isSubscribed ? "#F59E0B" : "#3D4F63",
                   fontWeight: isSubscribed ? 600 : 400,
                   whiteSpace: "nowrap",
                 }}
@@ -366,7 +350,7 @@ export default function App() {
                   : "Owner"}
               </span>
             </div>
-            <ChevronDown size={12} color="#4A5568" style={{ flexShrink: 0 }} />
+            <ChevronDown size={11} color="#3D4F63" style={{ flexShrink: 0 }} />
           </div>
 
           {/* Upgrade CTA */}
@@ -375,18 +359,13 @@ export default function App() {
               type="button"
               data-ocid="header.upgrade_button"
               onClick={() => setShowPaywall(true)}
+              className="btn-gold"
               style={{
                 padding: "6px 14px",
                 borderRadius: 8,
-                background: "linear-gradient(135deg, #F59E0B, #D97706)",
-                color: "#0A0800",
                 fontSize: 12,
-                fontWeight: 700,
-                border: "none",
-                cursor: "pointer",
                 letterSpacing: "0.02em",
                 whiteSpace: "nowrap",
-                boxShadow: "0 2px 10px rgba(245,158,11,0.35)",
                 flexShrink: 0,
               }}
             >
@@ -395,7 +374,7 @@ export default function App() {
           )}
         </header>
 
-        {/* Upgrade Banner — thin strip */}
+        {/* Upgrade Banner */}
         {!isSubscribed && !trialExpired && (
           <UpgradeBanner onUpgradeClick={() => setShowPaywall(true)} />
         )}
@@ -403,7 +382,7 @@ export default function App() {
         {/* Page content */}
         <main
           className="flex-1 overflow-y-auto"
-          style={{ padding: "24px 28px" }}
+          style={{ padding: "20px 24px" }}
         >
           {renderPage()}
         </main>
@@ -411,20 +390,20 @@ export default function App() {
         {/* Footer */}
         <footer
           style={{
-            padding: "10px 28px",
-            borderTop: "1px solid rgba(245,158,11,0.08)",
+            padding: "8px 24px",
+            borderTop: "1px solid rgba(255,255,255,0.04)",
             fontSize: 11,
-            color: "#334155",
+            color: "#2A3547",
             textAlign: "center",
             flexShrink: 0,
           }}
         >
-          © {new Date().getFullYear()} SellerSync Pro. Built with ❤️ using{" "}
+          © {new Date().getFullYear()} SellerSync Pro · Built with ❤️ using{" "}
           <a
             href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#F59E0B", textDecoration: "none" }}
+            style={{ color: "#D97706", textDecoration: "none" }}
           >
             caffeine.ai
           </a>

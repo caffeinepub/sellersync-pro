@@ -32,34 +32,53 @@ const tools = [
     icon: <Megaphone size={18} />,
     title: "Create Campaign",
     desc: "Launch promotional campaigns across platforms",
-    color: "#2F7CF6",
+    accent: "#F59E0B",
   },
   {
     icon: <Gift size={18} />,
     title: "Discount Manager",
     desc: "Set bulk discounts and coupon codes",
-    color: "#F2C94C",
+    accent: "#4ADE80",
   },
   {
     icon: <Star size={18} />,
     title: "Review Manager",
     desc: "Monitor and respond to product reviews",
-    color: "#2ECC71",
+    accent: "#60A5FA",
   },
   {
     icon: <TrendingUp size={18} />,
     title: "SEO Optimizer",
     desc: "Improve product listing search rankings",
-    color: "#4CC9F0",
+    accent: "#A78BFA",
   },
 ];
+
+const statusStyle: Record<
+  string,
+  { color: string; bg: string; border: string }
+> = {
+  active: {
+    color: "#4ADE80",
+    bg: "rgba(74,222,128,0.1)",
+    border: "rgba(74,222,128,0.2)",
+  },
+  scheduled: {
+    color: "#FCD34D",
+    bg: "rgba(252,211,77,0.1)",
+    border: "rgba(252,211,77,0.2)",
+  },
+  draft: {
+    color: "#5A6E85",
+    bg: "rgba(90,110,133,0.1)",
+    border: "rgba(90,110,133,0.15)",
+  },
+};
 
 export default function MarketingPage() {
   return (
     <div className="flex flex-col gap-4">
-      <h2
-        style={{ fontSize: 18, fontWeight: 700, color: "#E8EEF5", margin: 0 }}
-      >
+      <h2 className="section-title" style={{ margin: 0 }}>
         Marketing Tools
       </h2>
 
@@ -68,20 +87,16 @@ export default function MarketingPage() {
           <button
             type="button"
             key={t.title}
-            className="rounded-xl p-4 text-left transition-all min-w-0 overflow-hidden"
-            style={{
-              background: "#161F28",
-              border: "1px solid #243241",
-              cursor: "pointer",
-            }}
+            className="card-premium rounded-xl p-4 text-left min-w-0 overflow-hidden"
+            style={{ cursor: "pointer" }}
           >
             <div
-              className="flex items-center justify-center rounded-lg mb-2"
+              className="flex items-center justify-center rounded-lg mb-3"
               style={{
                 width: 38,
                 height: 38,
-                background: `${t.color}18`,
-                color: t.color,
+                background: `${t.accent}14`,
+                color: t.accent,
                 flexShrink: 0,
               }}
             >
@@ -91,112 +106,108 @@ export default function MarketingPage() {
               style={{
                 fontWeight: 600,
                 fontSize: 13,
-                color: "#E8EEF5",
-                marginBottom: 3,
+                color: "#D1D9E6",
+                marginBottom: 4,
               }}
             >
               {t.title}
             </div>
-            <div style={{ fontSize: 11, color: "#7B8FA0" }}>{t.desc}</div>
+            <div style={{ fontSize: 11.5, color: "#3D4F63", lineHeight: 1.4 }}>
+              {t.desc}
+            </div>
           </button>
         ))}
       </div>
 
-      <div
-        className="rounded-xl"
-        style={{
-          background: "#161F28",
-          border: "1px solid #243241",
-          overflow: "hidden",
-        }}
-      >
+      <div className="card-surface" style={{ overflow: "hidden" }}>
         <div
-          className="px-4 py-2"
-          style={{ borderBottom: "1px solid #1E2D3D" }}
+          style={{
+            padding: "12px 16px",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+          }}
         >
-          <span style={{ fontWeight: 600, fontSize: 13, color: "#E8EEF5" }}>
+          <span style={{ fontWeight: 600, fontSize: 13, color: "#D1D9E6" }}>
             Active Campaigns
           </span>
         </div>
-        <div className="p-3 flex flex-col gap-2" style={{ overflowX: "auto" }}>
-          {campaigns.map((c) => (
-            <div
-              key={c.name}
-              className="flex items-center gap-3 rounded-lg px-3 py-2"
-              style={{
-                background: "#0F1922",
-                border: "1px solid #1E2D3D",
-                minWidth: 0,
-              }}
-            >
+        <div className="p-3 flex flex-col gap-2">
+          {campaigns.map((c) => {
+            const st = statusStyle[c.status];
+            return (
               <div
-                className="flex items-center justify-center rounded-lg flex-shrink-0"
+                key={c.name}
+                className="data-table-row flex items-center gap-3 rounded-lg px-3 py-2.5"
                 style={{
-                  width: 30,
-                  height: 30,
-                  background: `${c.color}18`,
-                  color: c.color,
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  minWidth: 0,
                 }}
               >
-                <Megaphone size={14} />
-              </div>
-              <div className="flex-1 min-w-0">
                 <div
-                  className="truncate"
-                  style={{ fontWeight: 600, fontSize: 13, color: "#E8EEF5" }}
-                >
-                  {c.name}
-                </div>
-                <div style={{ fontSize: 10, color: "#7B8FA0" }}>
-                  Reach: {c.reach} · Conversion: {c.conversion}
-                </div>
-              </div>
-              <div
-                className="flex items-center gap-2"
-                style={{ flexShrink: 0 }}
-              >
-                <span
+                  className="flex items-center justify-center rounded-lg flex-shrink-0"
                   style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    padding: "2px 8px",
-                    borderRadius: 999,
-                    whiteSpace: "nowrap",
-                    color:
-                      c.status === "active"
-                        ? "#2ECC71"
-                        : c.status === "scheduled"
-                          ? "#F2C94C"
-                          : "#7B8FA0",
-                    background:
-                      c.status === "active"
-                        ? "rgba(46,204,113,0.12)"
-                        : c.status === "scheduled"
-                          ? "rgba(242,201,76,0.12)"
-                          : "#1E2D3D",
+                    width: 32,
+                    height: 32,
+                    background: `${c.color}15`,
+                    color: c.color,
                   }}
                 >
-                  {c.status.toUpperCase()}
-                </span>
-                <button
-                  type="button"
-                  style={{
-                    fontSize: 11,
-                    color: "#5B9FFF",
-                    background: "rgba(47,124,246,0.14)",
-                    border: "1px solid rgba(47,124,246,0.3)",
-                    padding: "4px 10px",
-                    borderRadius: 7,
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    flexShrink: 0,
-                  }}
+                  <Megaphone size={14} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div
+                    className="truncate"
+                    style={{ fontWeight: 600, fontSize: 13, color: "#D1D9E6" }}
+                  >
+                    {c.name}
+                  </div>
+                  <div
+                    style={{ fontSize: 10.5, color: "#3D4F63", marginTop: 1 }}
+                  >
+                    Reach: {c.reach} · Conv: {c.conversion}
+                  </div>
+                </div>
+                <div
+                  className="flex items-center gap-2"
+                  style={{ flexShrink: 0 }}
                 >
-                  Edit
-                </button>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      padding: "2px 9px",
+                      borderRadius: 999,
+                      whiteSpace: "nowrap",
+                      color: st.color,
+                      background: st.bg,
+                      border: `1px solid ${st.border}`,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    {c.status.toUpperCase()}
+                  </span>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11.5,
+                      color: "#F59E0B",
+                      background: "rgba(245,158,11,0.08)",
+                      border: "1px solid rgba(245,158,11,0.2)",
+                      padding: "4px 12px",
+                      borderRadius: 7,
+                      fontWeight: 600,
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    Edit
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

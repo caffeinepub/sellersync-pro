@@ -12,10 +12,8 @@ export default function AnalyticsPage() {
         paddingBottom: 16,
       }}
     >
-      <h2
-        style={{ fontSize: 18, fontWeight: 700, color: "#E8EEF5", margin: 0 }}
-      >
-        Analytics & Reports
+      <h2 className="section-title" style={{ margin: 0 }}>
+        Analytics &amp; Reports
       </h2>
 
       {/* Platform KPI Cards */}
@@ -29,24 +27,21 @@ export default function AnalyticsPage() {
         {platforms.map((p) => (
           <div
             key={p.id}
-            style={{
-              background: "#161F28",
-              border: "1px solid #243241",
-              borderRadius: 10,
-              padding: "10px 12px",
-            }}
+            className="card-premium"
+            style={{ padding: "12px 14px", borderRadius: 10 }}
           >
-            <div style={{ marginBottom: 6 }}>
+            <div style={{ marginBottom: 8 }}>
               <span
                 style={{
                   fontSize: 10,
                   fontWeight: 700,
                   color: p.color,
-                  background: `${p.color}22`,
-                  padding: "2px 7px",
+                  background: `${p.color}18`,
+                  padding: "2px 8px",
                   borderRadius: 999,
                   display: "inline-block",
                   whiteSpace: "nowrap",
+                  letterSpacing: "0.04em",
                 }}
               >
                 {p.name}
@@ -54,33 +49,36 @@ export default function AnalyticsPage() {
             </div>
             <div
               style={{
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: 800,
-                color: "#E8EEF5",
-                lineHeight: 1.2,
+                color: "#EEF2F7",
+                lineHeight: 1.1,
+                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+                letterSpacing: "-0.5px",
               }}
             >
               ₹{(p.revenue / 1000).toFixed(0)}K
             </div>
             <div
               style={{
-                fontSize: 10,
-                color: p.growth >= 0 ? "#2ECC71" : "#EB5757",
-                marginTop: 3,
+                fontSize: 10.5,
+                color: p.growth >= 0 ? "#4ADE80" : "#F87171",
+                marginTop: 4,
+                fontWeight: 600,
               }}
             >
               {p.growth >= 0 ? "+" : ""}
               {p.growth}% growth
             </div>
-            <div style={{ fontSize: 10, color: "#7B8FA0", marginTop: 1 }}>
+            <div style={{ fontSize: 10.5, color: "#3D4F63", marginTop: 1 }}>
               {p.orders} orders
             </div>
             <div
               style={{
                 height: 3,
-                background: "#1E2D3D",
+                background: "rgba(255,255,255,0.06)",
                 borderRadius: 999,
-                marginTop: 8,
+                marginTop: 10,
                 overflow: "hidden",
               }}
             >
@@ -93,7 +91,7 @@ export default function AnalyticsPage() {
                 }}
               />
             </div>
-            <div style={{ fontSize: 10, color: "#7B8FA0", marginTop: 3 }}>
+            <div style={{ fontSize: 10, color: "#3D4F63", marginTop: 4 }}>
               {((p.revenue / totalRevenue) * 100).toFixed(1)}% of total
             </div>
           </div>
@@ -101,14 +99,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Revenue Chart */}
-      <div
-        style={{
-          background: "#161F28",
-          border: "1px solid #243241",
-          borderRadius: 10,
-          overflow: "hidden",
-        }}
-      >
+      <div className="card-surface" style={{ overflow: "hidden" }}>
         <AnalyticsCard expanded />
       </div>
 
@@ -121,103 +112,94 @@ export default function AnalyticsPage() {
         }}
       >
         {/* Top Performing Categories */}
-        <div
-          style={{
-            background: "#161F28",
-            border: "1px solid #243241",
-            borderRadius: 10,
-            padding: "14px 16px",
-          }}
-        >
+        <div className="card-surface" style={{ padding: "16px 18px" }}>
           <h3
             style={{
               fontWeight: 600,
               fontSize: 13,
-              color: "#E8EEF5",
-              marginBottom: 12,
+              color: "#D1D9E6",
+              marginBottom: 14,
               marginTop: 0,
+              letterSpacing: "-0.2px",
             }}
           >
             Top Performing Categories
           </h3>
           {(
             [
-              ["Electronics", 45],
-              ["Clothing", 22],
-              ["Home Decor", 15],
-              ["Industrial", 12],
-              ["Beauty", 6],
-            ] as [string, number][]
-          ).map(([cat, pct]) => (
-            <div
-              key={cat}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 9,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "#9AA9B8",
-                  minWidth: 82,
-                  flexShrink: 0,
-                }}
-              >
-                {cat}
-              </span>
+              "Electronics",
+              "Clothing",
+              "Home Decor",
+              "Industrial",
+              "Beauty",
+            ] as const
+          ).map((cat, i) => {
+            const pct = [45, 22, 15, 12, 6][i];
+            return (
               <div
+                key={cat}
                 style={{
-                  flex: 1,
-                  height: 5,
-                  background: "#1E2D3D",
-                  borderRadius: 999,
-                  overflow: "hidden",
-                  minWidth: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  marginBottom: 10,
                 }}
               >
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "#5A6E85",
+                    minWidth: 82,
+                    flexShrink: 0,
+                  }}
+                >
+                  {cat}
+                </span>
                 <div
                   style={{
-                    width: `${pct}%`,
-                    height: "100%",
-                    background: "linear-gradient(90deg, #2F7CF6, #4CC9F0)",
+                    flex: 1,
+                    height: 4,
+                    background: "rgba(255,255,255,0.05)",
                     borderRadius: 999,
+                    overflow: "hidden",
+                    minWidth: 0,
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      width: `${pct}%`,
+                      height: "100%",
+                      background: "linear-gradient(90deg, #F59E0B, #FCD34D)",
+                      borderRadius: 999,
+                    }}
+                  />
+                </div>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "#EEF2F7",
+                    fontWeight: 600,
+                    minWidth: 32,
+                    textAlign: "right",
+                  }}
+                >
+                  {pct}%
+                </span>
               </div>
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "#E8EEF5",
-                  fontWeight: 600,
-                  minWidth: 32,
-                  textAlign: "right",
-                }}
-              >
-                {pct}%
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Platform Revenue Share */}
-        <div
-          style={{
-            background: "#161F28",
-            border: "1px solid #243241",
-            borderRadius: 10,
-            padding: "14px 16px",
-          }}
-        >
+        <div className="card-surface" style={{ padding: "16px 18px" }}>
           <h3
             style={{
               fontWeight: 600,
               fontSize: 13,
-              color: "#E8EEF5",
-              marginBottom: 12,
+              color: "#D1D9E6",
+              marginBottom: 14,
               marginTop: 0,
+              letterSpacing: "-0.2px",
             }}
           >
             Platform Revenue Share
@@ -230,14 +212,14 @@ export default function AnalyticsPage() {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
-                  marginBottom: 9,
+                  gap: 10,
+                  marginBottom: 10,
                 }}
               >
                 <span
                   style={{
                     fontSize: 11,
-                    color: "#9AA9B8",
+                    color: "#5A6E85",
                     minWidth: 76,
                     flexShrink: 0,
                   }}
@@ -247,8 +229,8 @@ export default function AnalyticsPage() {
                 <div
                   style={{
                     flex: 1,
-                    height: 5,
-                    background: "#1E2D3D",
+                    height: 4,
+                    background: "rgba(255,255,255,0.05)",
                     borderRadius: 999,
                     overflow: "hidden",
                     minWidth: 0,
@@ -266,7 +248,7 @@ export default function AnalyticsPage() {
                 <span
                   style={{
                     fontSize: 11,
-                    color: "#E8EEF5",
+                    color: "#EEF2F7",
                     fontWeight: 600,
                     minWidth: 48,
                     textAlign: "right",
@@ -279,23 +261,19 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Summary Report Table */}
-      <div
-        style={{
-          background: "#161F28",
-          border: "1px solid #243241",
-          borderRadius: 10,
-          overflow: "hidden",
-        }}
-      >
+      {/* Summary Table */}
+      <div className="card-surface" style={{ overflow: "hidden" }}>
         <div
-          style={{ padding: "10px 14px", borderBottom: "1px solid #1E2D3D" }}
+          style={{
+            padding: "12px 16px",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+          }}
         >
           <h3
             style={{
               fontWeight: 600,
               fontSize: 13,
-              color: "#E8EEF5",
+              color: "#D1D9E6",
               margin: 0,
             }}
           >
@@ -307,7 +285,7 @@ export default function AnalyticsPage() {
             style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}
           >
             <thead>
-              <tr style={{ background: "#1A2530" }}>
+              <tr style={{ background: "rgba(255,255,255,0.025)" }}>
                 {[
                   "Platform",
                   "Revenue",
@@ -319,12 +297,14 @@ export default function AnalyticsPage() {
                   <th
                     key={h}
                     style={{
-                      padding: "8px 12px",
-                      fontSize: 10,
+                      padding: "9px 14px",
+                      fontSize: 10.5,
                       fontWeight: 600,
-                      color: "#7B8FA0",
+                      color: "#3D4F63",
                       textAlign: "left",
                       whiteSpace: "nowrap",
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
                     }}
                   >
                     {h}
@@ -333,22 +313,20 @@ export default function AnalyticsPage() {
               </tr>
             </thead>
             <tbody>
-              {platforms.map((p, i) => (
+              {platforms.map((p) => (
                 <tr
                   key={p.id}
-                  style={{
-                    borderTop: "1px solid #1E2D3D",
-                    background: i % 2 === 0 ? "transparent" : "#12191F",
-                  }}
+                  className="data-table-row"
+                  style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
                 >
-                  <td style={{ padding: "8px 12px" }}>
+                  <td style={{ padding: "9px 14px" }}>
                     <span
                       style={{
                         fontSize: 11,
                         fontWeight: 700,
                         color: p.color,
-                        background: `${p.color}18`,
-                        padding: "2px 7px",
+                        background: `${p.color}15`,
+                        padding: "2px 8px",
                         borderRadius: 999,
                         whiteSpace: "nowrap",
                         display: "inline-block",
@@ -359,9 +337,9 @@ export default function AnalyticsPage() {
                   </td>
                   <td
                     style={{
-                      padding: "8px 12px",
+                      padding: "9px 14px",
                       fontSize: 12,
-                      color: "#E8EEF5",
+                      color: "#EEF2F7",
                       fontWeight: 600,
                       whiteSpace: "nowrap",
                     }}
@@ -370,9 +348,9 @@ export default function AnalyticsPage() {
                   </td>
                   <td
                     style={{
-                      padding: "8px 12px",
+                      padding: "9px 14px",
                       fontSize: 12,
-                      color: "#9AA9B8",
+                      color: "#5A6E85",
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -380,9 +358,9 @@ export default function AnalyticsPage() {
                   </td>
                   <td
                     style={{
-                      padding: "8px 12px",
+                      padding: "9px 14px",
                       fontSize: 12,
-                      color: "#9AA9B8",
+                      color: "#5A6E85",
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -390,12 +368,12 @@ export default function AnalyticsPage() {
                       ? `₹${Math.round(p.revenue / p.orders).toLocaleString("en-IN")}`
                       : "—"}
                   </td>
-                  <td style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "9px 14px", whiteSpace: "nowrap" }}>
                     <span
                       style={{
-                        fontSize: 11,
+                        fontSize: 11.5,
                         fontWeight: 600,
-                        color: p.growth >= 0 ? "#2ECC71" : "#EB5757",
+                        color: p.growth >= 0 ? "#4ADE80" : "#F87171",
                       }}
                     >
                       {p.growth >= 0 ? "+" : ""}
@@ -404,9 +382,9 @@ export default function AnalyticsPage() {
                   </td>
                   <td
                     style={{
-                      padding: "8px 12px",
+                      padding: "9px 14px",
                       fontSize: 12,
-                      color: "#9AA9B8",
+                      color: "#5A6E85",
                       whiteSpace: "nowrap",
                     }}
                   >

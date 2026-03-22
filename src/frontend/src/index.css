@@ -58,4 +58,129 @@
       opacity: 0.4;
     }
   }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@layer components {
+  /* Premium card with hover lift */
+  .card-premium {
+    background: #0f1117;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s
+      ease;
+  }
+  .card-premium:hover {
+    border-color: rgba(245, 158, 11, 0.18);
+    box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.05), 0 8px 32px
+      rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+  }
+
+  /* Sidebar nav items */
+  .sidebar-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid transparent;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    cursor: pointer;
+    background: transparent;
+  }
+  .sidebar-nav-btn:hover:not(.sidebar-nav-btn--active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  .sidebar-nav-btn--active {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  .sidebar-nav-btn--muted {
+    color: #3d4f63;
+  }
+
+  /* Table row hover */
+  .data-table-row {
+    transition: background 0.15s ease;
+  }
+  .data-table-row:hover {
+    background: rgba(245, 158, 11, 0.04) !important;
+  }
+
+  /* Status badge variants */
+  .badge-success {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+  }
+  .badge-warning {
+    color: #fcd34d;
+    background: rgba(252, 211, 77, 0.1);
+    border: 1px solid rgba(252, 211, 77, 0.2);
+  }
+  .badge-danger {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+  }
+  .badge-info {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+  }
+  .badge-muted {
+    color: #6b7a8d;
+    background: rgba(107, 122, 141, 0.1);
+    border: 1px solid rgba(107, 122, 141, 0.15);
+  }
+
+  /* Gold CTA button */
+  .btn-gold {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #0a0800;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 2px 12px rgba(245, 158, 11, 0.3);
+  }
+  .btn-gold:hover {
+    opacity: 0.92;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45);
+    transform: translateY(-1px);
+  }
+
+  /* Section header */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: -0.4px;
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  }
+
+  /* Subtle card bg */
+  .card-surface {
+    background: #0f1117;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+  }
+  .card-surface-raised {
+    background: #111420;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+  }
 }

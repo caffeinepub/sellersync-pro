@@ -6,33 +6,39 @@ import { useActor } from "../hooks/useActor";
 const PLANS = [
   {
     id: "weekly",
-    label: "Weekly",
+    label: "Starter",
+    period: "Weekly",
     price: "$9.99",
     per: "/ week",
-    monthlyEq: "~$43/mo",
+    note: "~$43/mo · Cancel anytime",
     badge: null,
-    tagline: "Best for trying out",
+    tagline: "Perfect for getting started",
     highlight: false,
+    features: 4,
   },
   {
     id: "monthly",
-    label: "Monthly",
+    label: "Professional",
+    period: "Monthly",
     price: "$29.99",
     per: "/ month",
-    monthlyEq: null,
+    note: "Most popular among growing sellers",
     badge: "Most Popular",
-    tagline: "Best value for growing sellers",
+    tagline: "Everything you need to scale",
     highlight: true,
+    features: 8,
   },
   {
     id: "yearly",
-    label: "Yearly",
+    label: "Enterprise",
+    period: "Yearly",
     price: "$249.99",
     per: "/ year",
-    monthlyEq: "~$20.83/mo · Save 31%",
+    note: "~$20.83/mo · Save 31%",
     badge: "Best ROI",
-    tagline: "For serious sellers",
+    tagline: "For serious multi-platform sellers",
     highlight: false,
+    features: 8,
   },
 ];
 
@@ -59,9 +65,7 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
   const handlePlanClick = async (planId: string) => {
     setCheckoutError(null);
     setLoadingPlan(planId);
-
     try {
-      // Try Stripe checkout via backend
       if (
         actor &&
         typeof (actor as any).createSubscriptionCheckout === "function"
@@ -78,12 +82,10 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
           return;
         }
       }
-      // Fallback: direct subscribe (trial / demo mode)
       onSubscribe(planId);
     } catch (err) {
       console.error("Checkout error:", err);
       setCheckoutError("Payment service unavailable. Please try again.");
-      // Fallback to direct subscribe so users aren't blocked
       onSubscribe(planId);
     } finally {
       setLoadingPlan(null);
@@ -100,55 +102,59 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "rgba(8,9,12,0.92)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        background: "rgba(5,6,10,0.94)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
         padding: "20px",
         overflowY: "auto",
       }}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         style={{
           width: "100%",
-          maxWidth: 900,
-          background: "linear-gradient(160deg, #0F1117 0%, #0A0C12 100%)",
-          border: "1px solid rgba(245,158,11,0.2)",
+          maxWidth: 920,
+          background: "linear-gradient(160deg, #0D0F17 0%, #090B11 100%)",
+          border: "1px solid rgba(245,158,11,0.18)",
           borderRadius: 20,
-          padding: "40px 36px 36px",
+          padding: "44px 40px 40px",
           boxShadow:
-            "0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(245,158,11,0.08)",
+            "0 40px 120px rgba(0,0,0,0.85), 0 0 80px rgba(245,158,11,0.04)",
           marginTop: "auto",
           marginBottom: "auto",
         }}
       >
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
             style={{
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              width: 56,
-              height: 56,
+              width: 60,
+              height: 60,
               borderRadius: "50%",
               background:
-                "linear-gradient(135deg, rgba(245,158,11,0.25), rgba(217,119,6,0.15))",
-              border: "1px solid rgba(245,158,11,0.3)",
-              marginBottom: 16,
+                "linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1))",
+              border: "1px solid rgba(245,158,11,0.25)",
+              marginBottom: 18,
+              boxShadow: "0 0 40px rgba(245,158,11,0.1)",
             }}
           >
-            <Crown size={26} style={{ color: "#F59E0B" }} />
-          </div>
+            <Crown size={28} style={{ color: "#F59E0B" }} />
+          </motion.div>
           <h2
             style={{
-              fontSize: 26,
+              fontSize: 28,
               fontWeight: 800,
               color: "#F1F5F9",
-              letterSpacing: "-0.5px",
-              marginBottom: 8,
+              letterSpacing: "-0.6px",
+              marginBottom: 10,
               fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
             }}
           >
@@ -157,9 +163,10 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
           <p
             style={{
               fontSize: 14,
-              color: "#94A3B8",
-              maxWidth: 440,
+              color: "#5A6E85",
+              maxWidth: 460,
               margin: "0 auto",
+              lineHeight: 1.6,
             }}
           >
             Join{" "}
@@ -170,16 +177,15 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
           </p>
         </div>
 
-        {/* Error message */}
         {checkoutError && (
           <div
             data-ocid="paywall.error_state"
             style={{
-              background: "rgba(239,68,68,0.1)",
-              border: "1px solid rgba(239,68,68,0.3)",
+              background: "rgba(239,68,68,0.08)",
+              border: "1px solid rgba(239,68,68,0.25)",
               borderRadius: 10,
               padding: "10px 16px",
-              marginBottom: 20,
+              marginBottom: 24,
               textAlign: "center",
               fontSize: 13,
               color: "#FCA5A5",
@@ -194,152 +200,182 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-            marginBottom: 28,
+            gap: 14,
+            marginBottom: 32,
           }}
         >
-          {PLANS.map((plan) => (
+          {PLANS.map((plan, idx) => (
             <motion.div
               key={plan.id}
-              whileHover={{ scale: 1.02, y: -3 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + idx * 0.06, duration: 0.35 }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
               style={{
                 position: "relative",
-                borderRadius: 14,
-                padding: "24px 22px",
+                borderRadius: 16,
+                padding: plan.highlight ? "28px 24px 24px" : "24px 22px 22px",
                 background: plan.highlight
-                  ? "linear-gradient(160deg, #1A1400 0%, #120E00 100%)"
-                  : "rgba(255,255,255,0.03)",
+                  ? "linear-gradient(160deg, #17120A 0%, #0F0B05 100%)"
+                  : "rgba(255,255,255,0.025)",
                 border: plan.highlight
-                  ? "1px solid rgba(245,158,11,0.5)"
+                  ? "1px solid rgba(245,158,11,0.45)"
                   : "1px solid rgba(255,255,255,0.06)",
                 boxShadow: plan.highlight
-                  ? "0 0 30px rgba(245,158,11,0.08), inset 0 1px 0 rgba(245,158,11,0.15)"
+                  ? "0 0 50px rgba(245,158,11,0.1), inset 0 1px 0 rgba(245,158,11,0.12)"
                   : "none",
                 display: "flex",
                 flexDirection: "column",
-                gap: 16,
+                gap: 18,
               }}
             >
+              {/* Badge */}
               {plan.badge && (
                 <div
                   style={{
                     position: "absolute",
-                    top: -11,
+                    top: -12,
                     left: "50%",
                     transform: "translateX(-50%)",
                     background: plan.highlight
                       ? "linear-gradient(90deg, #F59E0B, #D97706)"
-                      : "rgba(59,130,246,0.9)",
-                    color: plan.highlight ? "#0A0800" : "white",
-                    fontSize: 10.5,
+                      : "rgba(255,255,255,0.1)",
+                    color: plan.highlight ? "#0A0800" : "#CBD5E1",
+                    fontSize: 10,
                     fontWeight: 700,
-                    padding: "3px 10px",
+                    padding: "3px 12px",
                     borderRadius: 999,
-                    letterSpacing: "0.05em",
+                    letterSpacing: "0.07em",
                     whiteSpace: "nowrap",
+                    textTransform: "uppercase",
                   }}
                 >
                   {plan.badge}
                 </div>
               )}
+
+              {/* Plan header */}
               <div>
                 <div
                   style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: plan.highlight ? "#FCD34D" : "#94A3B8",
-                    letterSpacing: "0.08em",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: plan.highlight ? "#F59E0B" : "#3D4F63",
+                    letterSpacing: "0.1em",
                     textTransform: "uppercase",
-                    marginBottom: 6,
+                    marginBottom: 8,
                   }}
                 >
                   {plan.label}
                 </div>
                 <div
-                  style={{ display: "flex", alignItems: "baseline", gap: 4 }}
+                  style={{ display: "flex", alignItems: "baseline", gap: 3 }}
                 >
                   <span
                     style={{
-                      fontSize: 32,
+                      fontSize: 34,
                       fontWeight: 800,
-                      color: plan.highlight ? "#F59E0B" : "#E2E8F0",
-                      letterSpacing: "-1px",
+                      color: plan.highlight ? "#F59E0B" : "#D1D9E6",
+                      letterSpacing: "-1.5px",
+                      fontFamily:
+                        "'Bricolage Grotesque', system-ui, sans-serif",
                     }}
                   >
                     {plan.price}
                   </span>
-                  <span style={{ fontSize: 13, color: "#64748B" }}>
+                  <span
+                    style={{ fontSize: 12, color: "#3D4F63", marginBottom: 4 }}
+                  >
                     {plan.per}
                   </span>
                 </div>
-                {plan.monthlyEq && (
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: plan.highlight ? "#86EFAC" : "#64748B",
-                      marginTop: 2,
-                    }}
-                  >
-                    {plan.monthlyEq}
-                  </div>
-                )}
-                <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: plan.highlight ? "#86EFAC" : "#3D4F63",
+                    marginTop: 3,
+                  }}
+                >
+                  {plan.note}
+                </div>
+                <div style={{ fontSize: 12, color: "#5A6E85", marginTop: 6 }}>
                   {plan.tagline}
                 </div>
               </div>
 
+              {/* Features */}
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 7,
+                  gap: 6,
                   flex: 1,
                 }}
               >
-                {FEATURES.slice(0, 5).map((feat) => (
+                {FEATURES.slice(0, plan.features).map((feat) => (
                   <div
                     key={feat}
-                    style={{ display: "flex", alignItems: "center", gap: 7 }}
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
                   >
-                    <Check
-                      size={13}
+                    <div
                       style={{
-                        color: plan.highlight ? "#F59E0B" : "#3B82F6",
+                        width: 16,
+                        height: 16,
+                        borderRadius: "50%",
+                        background: plan.highlight
+                          ? "rgba(245,158,11,0.15)"
+                          : "rgba(255,255,255,0.05)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                         flexShrink: 0,
                       }}
-                    />
-                    <span style={{ fontSize: 12, color: "#94A3B8" }}>
+                    >
+                      <Check
+                        size={9}
+                        style={{
+                          color: plan.highlight ? "#F59E0B" : "#4ADE80",
+                        }}
+                      />
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: plan.highlight ? "#B0BCC8" : "#4A5B6E",
+                        lineHeight: 1.3,
+                      }}
+                    >
                       {feat}
                     </span>
                   </div>
                 ))}
               </div>
 
+              {/* CTA */}
               <button
                 type="button"
                 data-ocid={`paywall.${plan.id}_button`}
                 onClick={() => handlePlanClick(plan.id)}
                 disabled={loadingPlan !== null}
+                className={plan.highlight ? "btn-gold" : ""}
                 style={{
                   width: "100%",
-                  padding: "11px 0",
+                  padding: "12px 0",
                   borderRadius: 10,
                   fontWeight: 700,
-                  fontSize: 13.5,
+                  fontSize: 13,
                   cursor: loadingPlan !== null ? "not-allowed" : "pointer",
                   letterSpacing: "0.01em",
                   transition: "all 0.2s",
-                  border: "none",
+                  border: plan.highlight
+                    ? "none"
+                    : "1px solid rgba(255,255,255,0.1)",
                   background: plan.highlight
-                    ? "linear-gradient(135deg, #F59E0B, #D97706)"
-                    : "rgba(59,130,246,0.15)",
-                  color: plan.highlight ? "#0A0800" : "#93C5FD",
-                  boxShadow: plan.highlight
-                    ? "0 4px 16px rgba(245,158,11,0.3)"
-                    : "none",
+                    ? undefined
+                    : "rgba(255,255,255,0.04)",
+                  color: plan.highlight ? undefined : "#7B8FA0",
                   opacity:
-                    loadingPlan !== null && loadingPlan !== plan.id ? 0.5 : 1,
+                    loadingPlan !== null && loadingPlan !== plan.id ? 0.45 : 1,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -357,7 +393,7 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
                 ) : (
                   <>
                     <Zap size={13} />
-                    Start {plan.label} Plan
+                    Get {plan.period} Access
                   </>
                 )}
               </button>
@@ -365,10 +401,11 @@ export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
           ))}
         </div>
 
-        {/* Bottom */}
+        {/* Footer note */}
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 11.5, color: "#475569" }}>
-            🔒 Secure payment via Stripe · Cancel anytime · Instant access
+          <p style={{ fontSize: 11.5, color: "#2A3547" }}>
+            🔒 Secure payment via Stripe · Cancel anytime · Instant access after
+            payment
           </p>
         </div>
       </motion.div>

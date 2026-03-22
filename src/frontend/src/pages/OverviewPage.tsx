@@ -20,18 +20,25 @@ export default function OverviewPage({
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1
             style={{
-              fontSize: 22,
+              fontSize: 21,
               fontWeight: 800,
-              color: "#E8EEF5",
+              color: "#EEF2F7",
               letterSpacing: "-0.5px",
               margin: 0,
               lineHeight: 1.2,
-              wordBreak: "break-word",
+              fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
             }}
           >
             {greeting}, Admin 👋
           </h1>
-          <p style={{ fontSize: 12, color: "#7B8FA0", margin: "3px 0 0" }}>
+          <p
+            style={{
+              fontSize: 12.5,
+              color: "#3D4F63",
+              margin: "4px 0 0",
+              letterSpacing: "0.01em",
+            }}
+          >
             Your 5-platform business is running. Here&apos;s what matters today.
           </p>
         </div>
@@ -41,15 +48,16 @@ export default function OverviewPage({
             onClick={() => setTab("integrations")}
             data-ocid="overview.secondary_button"
             style={{
-              fontSize: 11,
+              fontSize: 12,
               padding: "6px 14px",
               borderRadius: 8,
-              background: "rgba(47,124,246,0.14)",
-              border: "1px solid rgba(47,124,246,0.3)",
-              color: "#5B9FFF",
+              background: "rgba(245,158,11,0.1)",
+              border: "1px solid rgba(245,158,11,0.2)",
+              color: "#F59E0B",
               fontWeight: 600,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              transition: "all 0.15s",
             }}
           >
             + Connect Platform
@@ -59,15 +67,16 @@ export default function OverviewPage({
             onClick={() => setTab("analytics")}
             data-ocid="overview.secondary_button"
             style={{
-              fontSize: 11,
+              fontSize: 12,
               padding: "6px 14px",
               borderRadius: 8,
-              background: "#1A2530",
-              border: "1px solid #243241",
-              color: "#9AA9B8",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "#5A6E85",
               fontWeight: 600,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              transition: "all 0.15s",
             }}
           >
             Full Analytics
@@ -87,14 +96,8 @@ export default function OverviewPage({
         }}
       >
         <div
-          className="rounded-xl flex flex-col"
-          style={{
-            background: "linear-gradient(135deg, #0F1117, #161F28)",
-            border: "1px solid #1E2D3D",
-            minHeight: 340,
-            maxHeight: 440,
-            overflow: "hidden",
-          }}
+          className="card-premium rounded-xl flex flex-col"
+          style={{ minHeight: 340, maxHeight: 440, overflow: "hidden" }}
         >
           <AIAssistant />
         </div>
