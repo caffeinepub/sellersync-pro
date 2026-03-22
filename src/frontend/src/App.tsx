@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import PaywallModal from "./components/PaywallModal";
 import TrialBanner from "./components/TrialBanner";
 import UpgradeBanner from "./components/UpgradeBanner";
+import UpiPaymentBot from "./components/UpiPaymentBot";
 import { useTrialTimer } from "./hooks/useTrialTimer";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
@@ -56,6 +57,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>("overview");
   const [search, setSearch] = useState("");
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallDefaultTab, setPaywallDefaultTab] = useState<"plans" | "upi">(
+    "plans",
+  );
   const {
     secondsLeft,
     trialExpired,
@@ -87,6 +91,7 @@ export default function App() {
   const handleSubscribe = (plan: string) => {
     subscribe(plan);
     setShowPaywall(false);
+    setPaywallDefaultTab("plans");
   };
 
   const renderPage = () => {
@@ -120,7 +125,10 @@ export default function App() {
     >
       {/* Paywall */}
       {(trialExpired || showPaywall) && !isSubscribed && (
-        <PaywallModal onSubscribe={handleSubscribe} />
+        <PaywallModal
+          onSubscribe={handleSubscribe}
+          defaultTab={paywallDefaultTab}
+        />
       )}
 
       {/* Left Sidebar */}
@@ -409,6 +417,20 @@ export default function App() {
           </a>
         </footer>
       </div>
+
+      {/* UPI Payment Bot */}
+      <UpiPaymentBot
+        trialExpired={trialExpired}
+        isSubscribed={isSubscribed}
+        onOpenUpi={() => {
+          setPaywallDefaultTab("upi");
+          setShowPaywall(true);
+        }}
+        onOpenPlans={() => {
+          setPaywallDefaultTab("plans");
+          setShowPaywall(true);
+        }}
+      />
     </div>
   );
 }

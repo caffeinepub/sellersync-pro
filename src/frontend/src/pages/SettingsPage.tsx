@@ -17,6 +17,7 @@ import {
   permissions as defaultPerms,
   platforms as defaultPlatforms,
 } from "../data/mockData";
+import { useActor } from "../hooks/useActor";
 
 type TabId =
   | "account"
@@ -80,16 +81,19 @@ function Btn({
   onClick,
   outline,
   style,
+  disabled,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   outline?: boolean;
   style?: React.CSSProperties;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       style={{
         background: outline
           ? "transparent"
@@ -100,7 +104,8 @@ function Btn({
         padding: "6px 14px",
         borderRadius: 6,
         border: outline ? "1px solid #F59E0B" : "none",
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.55 : 1,
         ...style,
       }}
     >
@@ -236,6 +241,8 @@ function AccountTab() {
 }
 
 function StripeTab() {
+  const { actor: _actor } = useActor();
+  const actor = _actor as any;
   const [keys, setKeys] = useState({
     secret: "",
     publishable: "",
@@ -243,15 +250,43 @@ function StripeTab() {
   });
   const [showSecret, setShowSecret] = useState(false);
   const [showWebhook, setShowWebhook] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
   const [testStatus, setTestStatus] = useState<
     "idle" | "testing" | "ok" | "fail"
   >("idle");
-  const handleTest = () => {
+
+  const busy = saveStatus === "saving" || testStatus === "testing";
+
+  const handleSave = async () => {
+    if (!actor || !keys.secret) return;
+    setSaveStatus("saving");
+    try {
+      await actor.setStripeKey(keys.secret);
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2500);
+    } catch {
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 2500);
+    }
+  };
+
+  const handleTest = async () => {
+    if (!actor || !keys.secret) return;
     setTestStatus("testing");
-    setTimeout(
-      () => setTestStatus(keys.secret.startsWith("sk_") ? "ok" : "fail"),
-      1200,
-    );
+    try {
+      await actor.setStripeKey(keys.secret);
+      const result = await actor.createSubscriptionCheckout(
+        "monthly",
+        `${window.location.origin}?payment=success`,
+        `${window.location.origin}?payment=cancelled`,
+      );
+      setTestStatus(result.startsWith("https://") ? "ok" : "fail");
+    } catch {
+      setTestStatus("fail");
+    }
+    setTimeout(() => setTestStatus("idle"), 4000);
   };
 
   return (
@@ -266,6 +301,11 @@ function StripeTab() {
               </span>
               <div style={{ position: "relative" }}>
                 <input
+                  data-ocid={
+                    k === "secret"
+                      ? "stripe.secret.input"
+                      : "stripe.webhook.input"
+                  }
                   style={{ ...inp, paddingRight: 36 }}
                   type={
                     k === "secret"
@@ -314,6 +354,7 @@ function StripeTab() {
           <div>
             <span style={lbl}>Publishable Key</span>
             <input
+              data-ocid="stripe.publishable.input"
               style={inp}
               placeholder="pk_live_... or pk_test_..."
               value={keys.publishable}
@@ -332,10 +373,38 @@ function StripeTab() {
             flexWrap: "wrap",
           }}
         >
-          <Btn onClick={handleTest}>
+          <Btn onClick={handleTest} disabled={busy || !keys.secret}>
             {testStatus === "testing" ? "Testing..." : "Test Connection"}
           </Btn>
-          <Btn outline>Save Keys</Btn>
+          <Btn outline onClick={handleSave} disabled={busy || !keys.secret}>
+            {saveStatus === "saving" ? "Saving..." : "Save Keys"}
+          </Btn>
+          {saveStatus === "saved" && (
+            <span
+              style={{
+                fontSize: 12,
+                color: "#2ECC71",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <CheckCircle size={12} /> Saved
+            </span>
+          )}
+          {saveStatus === "error" && (
+            <span
+              style={{
+                fontSize: 12,
+                color: "#EB5757",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <XCircle size={12} /> Error saving key
+            </span>
+          )}
           {testStatus === "ok" && (
             <span
               style={{
