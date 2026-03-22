@@ -24,6 +24,7 @@ import { useTrialTimer } from "./hooks/useTrialTimer";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
 import InventoryPage from "./pages/InventoryPage";
+import LandingPage from "./pages/LandingPage";
 import MarketingPage from "./pages/MarketingPage";
 import OrdersPage from "./pages/OrdersPage";
 import OverviewPage from "./pages/OverviewPage";
@@ -54,12 +55,10 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState<NavTab>("overview");
   const [search, setSearch] = useState("");
   const [showPaywall, setShowPaywall] = useState(false);
-  const [paywallDefaultTab, setPaywallDefaultTab] = useState<"plans" | "upi">(
-    "plans",
-  );
   const {
     secondsLeft,
     trialExpired,
@@ -88,10 +87,13 @@ export default function App() {
     }
   }, [subscribeFromStripe]);
 
+  if (showLanding) {
+    return <LandingPage onEnter={() => setShowLanding(false)} />;
+  }
+
   const handleSubscribe = (plan: string) => {
     subscribe(plan);
     setShowPaywall(false);
-    setPaywallDefaultTab("plans");
   };
 
   const renderPage = () => {
@@ -125,10 +127,7 @@ export default function App() {
     >
       {/* Paywall */}
       {(trialExpired || showPaywall) && !isSubscribed && (
-        <PaywallModal
-          onSubscribe={handleSubscribe}
-          defaultTab={paywallDefaultTab}
-        />
+        <PaywallModal onSubscribe={handleSubscribe} />
       )}
 
       {/* Left Sidebar */}
@@ -423,11 +422,6 @@ export default function App() {
         trialExpired={trialExpired}
         isSubscribed={isSubscribed}
         onOpenUpi={() => {
-          setPaywallDefaultTab("upi");
-          setShowPaywall(true);
-        }}
-        onOpenPlans={() => {
-          setPaywallDefaultTab("plans");
           setShowPaywall(true);
         }}
       />

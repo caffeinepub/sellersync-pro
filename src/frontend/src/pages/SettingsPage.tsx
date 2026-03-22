@@ -2,14 +2,13 @@ import {
   AlertTriangle,
   Bell,
   CheckCircle,
+  Copy,
   CreditCard,
-  Eye,
-  EyeOff,
   Link,
   Lock,
+  QrCode,
   Shield,
   User,
-  XCircle,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
@@ -17,11 +16,10 @@ import {
   permissions as defaultPerms,
   platforms as defaultPlatforms,
 } from "../data/mockData";
-import { useActor } from "../hooks/useActor";
 
 type TabId =
   | "account"
-  | "stripe"
+  | "payments"
   | "ai"
   | "notifications"
   | "platforms"
@@ -29,7 +27,7 @@ type TabId =
 
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "account", label: "Account", icon: <User size={14} /> },
-  { id: "stripe", label: "Payments", icon: <CreditCard size={14} /> },
+  { id: "payments", label: "Payments", icon: <CreditCard size={14} /> },
   { id: "ai", label: "AI Perms", icon: <Zap size={14} /> },
   { id: "notifications", label: "Alerts", icon: <Bell size={14} /> },
   { id: "platforms", label: "Platforms", icon: <Link size={14} /> },
@@ -240,240 +238,260 @@ function AccountTab() {
   );
 }
 
-function StripeTab() {
-  const { actor: _actor } = useActor();
-  const actor = _actor as any;
-  const [keys, setKeys] = useState({
-    secret: "",
-    publishable: "",
-    webhook: "",
-  });
-  const [showSecret, setShowSecret] = useState(false);
-  const [showWebhook, setShowWebhook] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<
-    "idle" | "saving" | "saved" | "error"
-  >("idle");
-  const [testStatus, setTestStatus] = useState<
-    "idle" | "testing" | "ok" | "fail"
-  >("idle");
+function UpiPaymentsTab() {
+  const UPI_ID = "prashant.ps116-4@oksbi";
+  const PLANS_DATA = [
+    {
+      id: "weekly",
+      label: "Weekly",
+      amount: "₹830",
+      amountNum: 830,
+      per: "/week",
+    },
+    {
+      id: "monthly",
+      label: "Monthly",
+      amount: "₹2,499",
+      amountNum: 2499,
+      per: "/month",
+      popular: true,
+    },
+    {
+      id: "yearly",
+      label: "Yearly",
+      amount: "₹20,833",
+      amountNum: 20833,
+      per: "/year",
+    },
+  ];
+  const [selectedPlan, setSelectedPlan] = useState(PLANS_DATA[1]);
 
-  const busy = saveStatus === "saving" || testStatus === "testing";
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${encodeURIComponent(UPI_ID)}%26pn=SellerSync%20Pro%26am=${selectedPlan.amountNum}%26cu=INR`;
 
-  const handleSave = async () => {
-    if (!actor || !keys.secret) return;
-    setSaveStatus("saving");
-    try {
-      await actor.setStripeKey(keys.secret);
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2500);
-    } catch {
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 2500);
-    }
+  const copyUpi = () => {
+    navigator.clipboard.writeText(UPI_ID).then(() => {
+      import("sonner").then(({ toast }) => toast.success("UPI ID copied!"));
+    });
   };
 
-  const handleTest = async () => {
-    if (!actor || !keys.secret) return;
-    setTestStatus("testing");
-    try {
-      await actor.setStripeKey(keys.secret);
-      const result = await actor.createSubscriptionCheckout(
-        "monthly",
-        `${window.location.origin}?payment=success`,
-        `${window.location.origin}?payment=cancelled`,
-      );
-      setTestStatus(result.startsWith("https://") ? "ok" : "fail");
-    } catch {
-      setTestStatus("fail");
-    }
-    setTimeout(() => setTestStatus("idle"), 4000);
+  const handleAction = (type: "renew" | "new") => {
+    import("sonner").then(({ toast }) =>
+      toast.success(
+        type === "renew"
+          ? "After payment, send the screenshot to support to renew your subscription."
+          : "After payment, send the screenshot to support to activate your subscription.",
+      ),
+    );
   };
 
   return (
     <div>
+      {/* Plan Selector */}
       <div style={card}>
-        <p style={sh}>Stripe Configuration</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {(["secret", "webhook"] as const).map((k) => (
-            <div key={k}>
-              <span style={lbl}>
-                {k === "secret" ? "Secret Key" : "Webhook Secret"}
-              </span>
-              <div style={{ position: "relative" }}>
-                <input
-                  data-ocid={
-                    k === "secret"
-                      ? "stripe.secret.input"
-                      : "stripe.webhook.input"
-                  }
-                  style={{ ...inp, paddingRight: 36 }}
-                  type={
-                    k === "secret"
-                      ? showSecret
-                        ? "text"
-                        : "password"
-                      : showWebhook
-                        ? "text"
-                        : "password"
-                  }
-                  placeholder={
-                    k === "secret" ? "sk_live_... or sk_test_..." : "whsec_..."
-                  }
-                  value={keys[k]}
-                  onChange={(e) =>
-                    setKeys((prev) => ({ ...prev, [k]: e.target.value }))
-                  }
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    k === "secret"
-                      ? setShowSecret((v) => !v)
-                      : setShowWebhook((v) => !v)
-                  }
+        <p style={sh}>Subscription Plans</p>
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            flexWrap: "wrap",
+            marginBottom: 14,
+          }}
+        >
+          {PLANS_DATA.map((plan) => (
+            <button
+              key={plan.id}
+              type="button"
+              data-ocid={`payments.${plan.id}_button`}
+              onClick={() => setSelectedPlan(plan)}
+              style={{
+                padding: "8px 18px",
+                borderRadius: 999,
+                border:
+                  selectedPlan.id === plan.id
+                    ? "1px solid rgba(245,158,11,0.6)"
+                    : "1px solid rgba(255,255,255,0.08)",
+                background:
+                  selectedPlan.id === plan.id
+                    ? "rgba(245,158,11,0.12)"
+                    : "rgba(255,255,255,0.03)",
+                color: selectedPlan.id === plan.id ? "#F59E0B" : "#5A6E85",
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: "pointer",
+                transition: "all 0.18s",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              {plan.label}
+              {plan.popular && (
+                <span
                   style={{
-                    position: "absolute",
-                    right: 10,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "#7B8FA0",
+                    fontSize: 9,
+                    background: "linear-gradient(90deg,#F59E0B,#D97706)",
+                    color: "#0A0800",
+                    padding: "1px 6px",
+                    borderRadius: 999,
+                    fontWeight: 800,
+                    letterSpacing: "0.06em",
                   }}
                 >
-                  {(k === "secret" ? showSecret : showWebhook) ? (
-                    <EyeOff size={13} />
-                  ) : (
-                    <Eye size={13} />
-                  )}
+                  POPULAR
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        <div style={{ fontSize: 13, color: "#7B8FA0" }}>
+          Selected:{" "}
+          <span style={{ color: "#F59E0B", fontWeight: 700 }}>
+            {selectedPlan.amount} {selectedPlan.per}
+          </span>
+        </div>
+      </div>
+
+      {/* UPI Payment */}
+      <div style={card}>
+        <p style={sh}>
+          <QrCode
+            size={14}
+            style={{
+              display: "inline",
+              marginRight: 6,
+              verticalAlign: "middle",
+            }}
+          />
+          Pay via UPI / QR Code
+        </p>
+        <div
+          style={{
+            display: "flex",
+            gap: 24,
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* QR Code */}
+          <div
+            style={{
+              background: "#FFFFFF",
+              borderRadius: 12,
+              padding: 10,
+              flexShrink: 0,
+              boxShadow: "0 0 0 1px rgba(245,158,11,0.2)",
+            }}
+          >
+            <img
+              src={qrUrl}
+              alt="UPI QR Code"
+              width={140}
+              height={140}
+              style={{ display: "block", borderRadius: 4 }}
+            />
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              minWidth: 200,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            {/* UPI ID */}
+            <div>
+              <span style={lbl}>UPI ID</span>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "rgba(245,158,11,0.06)",
+                  border: "1px solid rgba(245,158,11,0.22)",
+                  borderRadius: 8,
+                  padding: "7px 12px",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#F59E0B",
+                    flex: 1,
+                  }}
+                >
+                  {UPI_ID}
+                </span>
+                <button
+                  type="button"
+                  data-ocid="payments.copy_upi_button"
+                  onClick={copyUpi}
+                  style={{
+                    background: "rgba(245,158,11,0.15)",
+                    border: "none",
+                    borderRadius: 6,
+                    width: 26,
+                    height: 26,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: "#F59E0B",
+                  }}
+                >
+                  <Copy size={12} />
                 </button>
               </div>
             </div>
-          ))}
-          <div>
-            <span style={lbl}>Publishable Key</span>
-            <input
-              data-ocid="stripe.publishable.input"
-              style={inp}
-              placeholder="pk_live_... or pk_test_..."
-              value={keys.publishable}
-              onChange={(e) =>
-                setKeys((k) => ({ ...k, publishable: e.target.value }))
-              }
-            />
+
+            {/* Amount */}
+            <div>
+              <span style={lbl}>Amount to Pay</span>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#F59E0B" }}>
+                {selectedPlan.amount}{" "}
+                <span
+                  style={{ fontSize: 13, color: "#7B8FA0", fontWeight: 500 }}
+                >
+                  {selectedPlan.per}
+                </span>
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div style={{ fontSize: 12, color: "#7B8FA0", lineHeight: 1.8 }}>
+              <div>1. Open GPay, PhonePe, or Paytm</div>
+              <div>2. Scan QR code or enter UPI ID above</div>
+              <div>
+                3. Pay{" "}
+                <strong style={{ color: "#E8EEF5" }}>
+                  {selectedPlan.amount}
+                </strong>
+              </div>
+              <div>4. Send payment screenshot to support</div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Btn
+                onClick={() => handleAction("renew")}
+                data-ocid="payments.renew_button"
+              >
+                Renew Subscription
+              </Btn>
+              <Btn
+                outline
+                onClick={() => handleAction("new")}
+                data-ocid="payments.new_subscription_button"
+              >
+                New Subscription
+              </Btn>
+            </div>
           </div>
-        </div>
-        <div
-          style={{
-            marginTop: 10,
-            display: "flex",
-            gap: 8,
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <Btn onClick={handleTest} disabled={busy || !keys.secret}>
-            {testStatus === "testing" ? "Testing..." : "Test Connection"}
-          </Btn>
-          <Btn outline onClick={handleSave} disabled={busy || !keys.secret}>
-            {saveStatus === "saving" ? "Saving..." : "Save Keys"}
-          </Btn>
-          {saveStatus === "saved" && (
-            <span
-              style={{
-                fontSize: 12,
-                color: "#2ECC71",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <CheckCircle size={12} /> Saved
-            </span>
-          )}
-          {saveStatus === "error" && (
-            <span
-              style={{
-                fontSize: 12,
-                color: "#EB5757",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <XCircle size={12} /> Error saving key
-            </span>
-          )}
-          {testStatus === "ok" && (
-            <span
-              style={{
-                fontSize: 12,
-                color: "#2ECC71",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <CheckCircle size={12} /> Connected
-            </span>
-          )}
-          {testStatus === "fail" && (
-            <span
-              style={{
-                fontSize: 12,
-                color: "#EB5757",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <XCircle size={12} /> Invalid key
-            </span>
-          )}
         </div>
       </div>
-      <div style={card}>
-        <p style={sh}>Current Subscription</p>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              background: "#F59E0B18",
-              border: "1px solid #F59E0B44",
-              borderRadius: 8,
-              padding: "10px 16px",
-              minWidth: 150,
-            }}
-          >
-            <div style={{ fontSize: 10, color: "#F59E0B", fontWeight: 700 }}>
-              ACTIVE PLAN
-            </div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#E8EEF5" }}>
-              Monthly
-            </div>
-            <div style={{ fontSize: 12, color: "#9AA9B8" }}>$29.99 / month</div>
-          </div>
-          <div
-            style={{ flex: 1, fontSize: 12, color: "#7B8FA0", lineHeight: 1.7 }}
-          >
-            Next billing:{" "}
-            <span style={{ color: "#E8EEF5", fontWeight: 600 }}>
-              April 22, 2026
-            </span>
-            <br />
-            Status:{" "}
-            <span style={{ color: "#2ECC71", fontWeight: 600 }}>Active</span>
-          </div>
-          <Btn outline>Manage Billing</Btn>
-        </div>
-      </div>
+
       <div
         style={{
           background: "#F59E0B0D",
@@ -490,8 +508,8 @@ function StripeTab() {
           style={{ color: "#F59E0B", flexShrink: 0, marginTop: 1 }}
         />
         <p style={{ fontSize: 12, color: "#D4A017", margin: 0 }}>
-          Use <strong>sk_test_</strong> keys for testing and{" "}
-          <strong>sk_live_</strong> for production.
+          After completing payment, send the transaction screenshot to our
+          support team to activate your subscription.
         </p>
       </div>
     </div>
@@ -994,7 +1012,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("account");
   const tabContent: Record<TabId, React.ReactNode> = {
     account: <AccountTab />,
-    stripe: <StripeTab />,
+    payments: <UpiPaymentsTab />,
     ai: <AITab />,
     notifications: <NotificationsTab />,
     platforms: <PlatformsTab />,

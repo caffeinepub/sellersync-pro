@@ -1,4 +1,4 @@
-import { Bot, CreditCard, QrCode, X } from "lucide-react";
+import { Bot, QrCode, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
@@ -6,14 +6,12 @@ interface UpiPaymentBotProps {
   trialExpired: boolean;
   isSubscribed: boolean;
   onOpenUpi: () => void;
-  onOpenPlans: () => void;
 }
 
 export default function UpiPaymentBot({
   trialExpired,
   isSubscribed,
   onOpenUpi,
-  onOpenPlans,
 }: UpiPaymentBotProps) {
   const [open, setOpen] = useState(false);
 
@@ -99,8 +97,8 @@ export default function UpiPaymentBot({
                 marginBottom: 14,
               }}
             >
-              Hi! Your trial has ended. You can subscribe with a card or pay
-              instantly via UPI — just scan a QR code!
+              Hi! Your trial has ended. Pay instantly via UPI — just scan the QR
+              code below to subscribe!
             </p>
 
             {/* Actions */}
@@ -131,32 +129,6 @@ export default function UpiPaymentBot({
               >
                 <QrCode size={13} />
                 Scan QR Code
-              </button>
-              <button
-                type="button"
-                data-ocid="upi_bot.subscribe_card_button"
-                onClick={() => {
-                  setOpen(false);
-                  onOpenPlans();
-                }}
-                style={{
-                  width: "100%",
-                  padding: "9px 0",
-                  borderRadius: 9,
-                  background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#7B8FA0",
-                  fontWeight: 600,
-                  fontSize: 12,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <CreditCard size={13} />
-                Subscribe with Card
               </button>
             </div>
           </motion.div>

@@ -1,28 +1,25 @@
 # SellerSync Pro
 
 ## Current State
-Version 7 deployed. Admin Settings compacted in v7. All main pages: Overview, Analytics, Orders, Inventory, Marketing, Integrations, Settings.
+The app is a full dashboard app with sidebar navigation, paywall, and multiple pages (Overview, Analytics, Orders, Inventory, Marketing, Integrations, Settings). There is no public-facing landing page -- the app loads directly into the dashboard.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new
+- A public landing page (`LandingPage` component) shown before the user enters the dashboard
+- Hero section: headline, sub-headline, CTA buttons ("Start Free Trial" / "See Demo")
+- Features section: highlight key benefits (multi-platform sync, AI automation, unified dashboard, UPI payments)
+- Platform logos row: Amazon, Flipkart, Meesho, Alibaba, IndiaMart
+- Pricing section: 3 plans (Weekly $9.99, Monthly $29.99, Yearly $249.99) with CTA
+- Footer with branding
+- Route logic in App.tsx: show LandingPage first, with a button to enter the dashboard
 
 ### Modify
-- Apply compact layout treatment to ALL pages
-- Fix remaining alignment, overflow, or visibility issues
-- Reduce excessive vertical spacing, padding throughout
-- Consistent spacing across all pages
+- App.tsx: Add a `showLanding` state (default true). When user clicks CTA, set `showLanding` to false and show the dashboard.
 
 ### Remove
-- Excessive padding/margins
+- Nothing removed
 
 ## Implementation Plan
-1. Compact OverviewPage: tighter header, smaller KPI cards, compact charts
-2. Compact AnalyticsPage: tighter chart containers, compact filters
-3. Compact OrdersPage: compact status pipeline, tighter table rows
-4. Compact InventoryPage: compact KPI row, tighter table
-5. Compact MarketingPage: tighter tool cards, compact campaign rows
-6. Compact IntegrationsPage: tighter platform cards
-7. Verify SettingsPage compact treatment is consistent
-8. Fix any overflow/alignment issues found
+1. Create `src/frontend/src/pages/LandingPage.tsx` with hero, features, platforms, pricing, and footer sections
+2. Update `App.tsx` to show LandingPage when `showLanding === true`, dashboard otherwise

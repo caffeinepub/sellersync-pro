@@ -8,6 +8,7 @@ export interface None {
 }
 export type Option<T> = Some<T> | None;
 export interface backendInterface {
+    _initializeAccessControlWithSecret(adminToken: string): Promise<void>;
     createSubscriptionCheckout(planId: string, successUrl: string, cancelUrl: string): Promise<string>;
     verifyCheckoutSession(sessionId: string): Promise<boolean>;
     setStripeKey(key: string): Promise<void>;

@@ -1,45 +1,33 @@
-import { Check, Copy, Crown, Loader2, Zap } from "lucide-react";
+import { Check, Copy, Crown } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useActor } from "../hooks/useActor";
 
 const PLANS = [
   {
     id: "weekly",
-    label: "Starter",
-    period: "Weekly",
-    price: "$9.99",
+    label: "Weekly",
+    price: "₹830",
+    amountNum: 830,
     per: "/ week",
-    note: "~$43/mo · Cancel anytime",
-    badge: null,
-    tagline: "Perfect for getting started",
-    highlight: false,
-    features: 4,
+    note: "~₹3,600/mo · Cancel anytime",
   },
   {
     id: "monthly",
-    label: "Professional",
-    period: "Monthly",
-    price: "$29.99",
+    label: "Monthly",
+    price: "₹2,499",
+    amountNum: 2499,
     per: "/ month",
-    note: "Most popular among growing sellers",
-    badge: "Most Popular",
-    tagline: "Everything you need to scale",
-    highlight: true,
-    features: 8,
+    note: "Most popular · Best value",
+    popular: true,
   },
   {
     id: "yearly",
-    label: "Enterprise",
-    period: "Yearly",
-    price: "$249.99",
+    label: "Yearly",
+    price: "₹20,833",
+    amountNum: 20833,
     per: "/ year",
-    note: "~$20.83/mo · Save 31%",
-    badge: "Best ROI",
-    tagline: "For serious multi-platform sellers",
-    highlight: false,
-    features: 8,
+    note: "~₹1,736/mo · Save 31%",
   },
 ];
 
@@ -55,56 +43,27 @@ const FEATURES = [
 ];
 
 const UPI_ID = "prashant.ps116-4@oksbi";
-const QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=${encodeURIComponent(UPI_ID)}%26pn=SellerSync%20Pro%26am=29.99%26cu=INR%26tn=SellerSync%20Pro%20Subscription`;
 
 interface PaywallModalProps {
   onSubscribe: (plan: string) => void;
-  defaultTab?: "plans" | "upi";
 }
 
-export default function PaywallModal({
-  onSubscribe,
-  defaultTab = "plans",
-}: PaywallModalProps) {
-  const { actor } = useActor();
-  const [activeTab, setActiveTab] = useState<"plans" | "upi">(defaultTab);
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+export default function PaywallModal({ onSubscribe }: PaywallModalProps) {
+  const [selectedPlan, setSelectedPlan] = useState(PLANS[1]);
 
-  const handlePlanClick = async (planId: string) => {
-    setCheckoutError(null);
-    setLoadingPlan(planId);
-    try {
-      if (
-        actor &&
-        typeof (actor as any).createSubscriptionCheckout === "function"
-      ) {
-        const successUrl = `${window.location.origin}?payment=success&plan=${planId}`;
-        const cancelUrl = `${window.location.origin}?payment=cancelled`;
-        const url = await (actor as any).createSubscriptionCheckout(
-          planId,
-          successUrl,
-          cancelUrl,
-        );
-        if (url && typeof url === "string") {
-          window.location.href = url;
-          return;
-        }
-      }
-      onSubscribe(planId);
-    } catch (err) {
-      console.error("Checkout error:", err);
-      setCheckoutError("Payment service unavailable. Please try again.");
-      onSubscribe(planId);
-    } finally {
-      setLoadingPlan(null);
-    }
-  };
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=${encodeURIComponent(UPI_ID)}%26pn=SellerSync%20Pro%26am=${selectedPlan.amountNum}%26cu=INR%26tn=SellerSync%20Pro%20Subscription`;
 
   const copyUpiId = () => {
     navigator.clipboard.writeText(UPI_ID).then(() => {
       toast.success("UPI ID copied!");
     });
+  };
+
+  const handleSubscribe = (planId: string) => {
+    toast.success(
+      "After payment, send the screenshot to support to activate your subscription.",
+    );
+    onSubscribe(planId);
   };
 
   return (
@@ -130,11 +89,11 @@ export default function PaywallModal({
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         style={{
           width: "100%",
-          maxWidth: 940,
+          maxWidth: 760,
           background: "linear-gradient(160deg, #0D0F17 0%, #090B11 100%)",
           border: "1px solid rgba(245,158,11,0.18)",
           borderRadius: 20,
-          padding: "44px 40px 40px",
+          padding: "40px 36px 36px",
           boxShadow:
             "0 40px 120px rgba(0,0,0,0.85), 0 0 80px rgba(245,158,11,0.04)",
           marginTop: "auto",
@@ -165,363 +124,158 @@ export default function PaywallModal({
           </motion.div>
           <h2
             style={{
-              fontSize: 28,
+              fontSize: 26,
               fontWeight: 800,
               color: "#F1F5F9",
               letterSpacing: "-0.6px",
-              marginBottom: 10,
+              marginBottom: 8,
               fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
             }}
           >
-            Your Free Trial Has Ended
+            Unlock SellerSync Pro
           </h2>
-          <p
-            style={{
-              fontSize: 14,
-              color: "#5A6E85",
-              maxWidth: 460,
-              margin: "0 auto",
-              lineHeight: 1.6,
-            }}
-          >
-            Join{" "}
-            <span style={{ color: "#F59E0B", fontWeight: 600 }}>
-              10,000+ sellers
-            </span>{" "}
-            who scaled their business with SellerSync Pro
+          <p style={{ fontSize: 14, color: "#4A5B6E", margin: 0 }}>
+            Your free trial has ended. Subscribe via UPI to continue.
           </p>
         </div>
 
-        {/* Tab switcher */}
+        {/* Plan Selector Pills */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            gap: 8,
+            gap: 10,
             marginBottom: 28,
+            flexWrap: "wrap",
           }}
         >
-          {(
-            [
-              { id: "plans", label: "💳 Card / Subscription" },
-              { id: "upi", label: "📱 Pay via UPI" },
-            ] as const
-          ).map((tab) => (
+          {PLANS.map((plan) => (
             <button
-              key={tab.id}
+              key={plan.id}
               type="button"
-              data-ocid={`paywall.${tab.id}_tab`}
-              onClick={() => setActiveTab(tab.id)}
+              data-ocid={`paywall.${plan.id}_tab`}
+              onClick={() => setSelectedPlan(plan)}
               style={{
-                padding: "8px 20px",
+                padding: "9px 22px",
                 borderRadius: 999,
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 cursor: "pointer",
                 transition: "all 0.2s",
                 border:
-                  activeTab === tab.id
+                  selectedPlan.id === plan.id
                     ? "1px solid rgba(245,158,11,0.6)"
                     : "1px solid rgba(255,255,255,0.08)",
                 background:
-                  activeTab === tab.id
-                    ? "rgba(245,158,11,0.1)"
+                  selectedPlan.id === plan.id
+                    ? "rgba(245,158,11,0.12)"
                     : "rgba(255,255,255,0.03)",
-                color: activeTab === tab.id ? "#F59E0B" : "#4A5B6E",
+                color: selectedPlan.id === plan.id ? "#F59E0B" : "#4A5B6E",
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
               }}
             >
-              {tab.label}
+              {plan.label}
+              {plan.popular && (
+                <span
+                  style={{
+                    fontSize: 9,
+                    background: "linear-gradient(90deg,#F59E0B,#D97706)",
+                    color: "#0A0800",
+                    padding: "1px 6px",
+                    borderRadius: 999,
+                    fontWeight: 800,
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  POPULAR
+                </span>
+              )}
             </button>
           ))}
         </div>
 
-        {checkoutError && (
+        {/* Main content: QR + info */}
+        <motion.div
+          key={selectedPlan.id}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          style={{
+            display: "flex",
+            gap: 32,
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {/* QR Code */}
           <div
-            data-ocid="paywall.error_state"
             style={{
-              background: "rgba(239,68,68,0.08)",
-              border: "1px solid rgba(239,68,68,0.25)",
-              borderRadius: 10,
-              padding: "10px 16px",
-              marginBottom: 24,
-              textAlign: "center",
-              fontSize: 13,
-              color: "#FCA5A5",
+              background: "#FFFFFF",
+              borderRadius: 16,
+              padding: 14,
+              boxShadow:
+                "0 0 0 1px rgba(245,158,11,0.2), 0 12px 40px rgba(0,0,0,0.5)",
+              flexShrink: 0,
             }}
           >
-            {checkoutError}
+            <img
+              src={qrUrl}
+              alt="UPI QR Code"
+              width={200}
+              height={200}
+              style={{ display: "block", borderRadius: 6 }}
+            />
           </div>
-        )}
 
-        {/* Plans Tab */}
-        {activeTab === "plans" && (
-          <>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 14,
-                marginBottom: 32,
-              }}
-            >
-              {PLANS.map((plan, idx) => (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + idx * 0.06, duration: 0.35 }}
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  style={{
-                    position: "relative",
-                    borderRadius: 16,
-                    padding: plan.highlight
-                      ? "28px 24px 24px"
-                      : "24px 22px 22px",
-                    background: plan.highlight
-                      ? "linear-gradient(160deg, #17120A 0%, #0F0B05 100%)"
-                      : "rgba(255,255,255,0.025)",
-                    border: plan.highlight
-                      ? "1px solid rgba(245,158,11,0.45)"
-                      : "1px solid rgba(255,255,255,0.06)",
-                    boxShadow: plan.highlight
-                      ? "0 0 50px rgba(245,158,11,0.1), inset 0 1px 0 rgba(245,158,11,0.12)"
-                      : "none",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 18,
-                  }}
-                >
-                  {plan.badge && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: -12,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        background: plan.highlight
-                          ? "linear-gradient(90deg, #F59E0B, #D97706)"
-                          : "rgba(255,255,255,0.1)",
-                        color: plan.highlight ? "#0A0800" : "#CBD5E1",
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: "3px 12px",
-                        borderRadius: 999,
-                        letterSpacing: "0.07em",
-                        whiteSpace: "nowrap",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {plan.badge}
-                    </div>
-                  )}
-
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: plan.highlight ? "#F59E0B" : "#3D4F63",
-                        letterSpacing: "0.1em",
-                        textTransform: "uppercase",
-                        marginBottom: 8,
-                      }}
-                    >
-                      {plan.label}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "baseline",
-                        gap: 3,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 34,
-                          fontWeight: 800,
-                          color: plan.highlight ? "#F59E0B" : "#D1D9E6",
-                          letterSpacing: "-1.5px",
-                          fontFamily:
-                            "'Bricolage Grotesque', system-ui, sans-serif",
-                        }}
-                      >
-                        {plan.price}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          color: "#3D4F63",
-                          marginBottom: 4,
-                        }}
-                      >
-                        {plan.per}
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: plan.highlight ? "#86EFAC" : "#3D4F63",
-                        marginTop: 3,
-                      }}
-                    >
-                      {plan.note}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "#5A6E85",
-                        marginTop: 6,
-                      }}
-                    >
-                      {plan.tagline}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 6,
-                      flex: 1,
-                    }}
-                  >
-                    {FEATURES.slice(0, plan.features).map((feat) => (
-                      <div
-                        key={feat}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 16,
-                            height: 16,
-                            borderRadius: "50%",
-                            background: plan.highlight
-                              ? "rgba(245,158,11,0.15)"
-                              : "rgba(255,255,255,0.05)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <Check
-                            size={9}
-                            style={{
-                              color: plan.highlight ? "#F59E0B" : "#4ADE80",
-                            }}
-                          />
-                        </div>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: plan.highlight ? "#B0BCC8" : "#4A5B6E",
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {feat}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    data-ocid={`paywall.${plan.id}_button`}
-                    onClick={() => handlePlanClick(plan.id)}
-                    disabled={loadingPlan !== null}
-                    className={plan.highlight ? "btn-gold" : ""}
-                    style={{
-                      width: "100%",
-                      padding: "12px 0",
-                      borderRadius: 10,
-                      fontWeight: 700,
-                      fontSize: 13,
-                      cursor: loadingPlan !== null ? "not-allowed" : "pointer",
-                      letterSpacing: "0.01em",
-                      transition: "all 0.2s",
-                      border: plan.highlight
-                        ? "none"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: plan.highlight
-                        ? undefined
-                        : "rgba(255,255,255,0.04)",
-                      color: plan.highlight ? undefined : "#7B8FA0",
-                      opacity:
-                        loadingPlan !== null && loadingPlan !== plan.id
-                          ? 0.45
-                          : 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
-                  >
-                    {loadingPlan === plan.id ? (
-                      <>
-                        <Loader2
-                          size={14}
-                          style={{ animation: "spin 1s linear infinite" }}
-                        />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <Zap size={13} />
-                        Get {plan.period} Access
-                      </>
-                    )}
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-
-            <div style={{ textAlign: "center" }}>
-              <p style={{ fontSize: 11.5, color: "#2A3547" }}>
-                🔒 Secure payment · Cancel anytime · Instant access after
-                payment
-              </p>
-            </div>
-          </>
-        )}
-
-        {/* UPI Tab */}
-        {activeTab === "upi" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+          {/* Right side */}
+          <div
             style={{
+              flex: 1,
+              minWidth: 220,
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              gap: 20,
-              paddingBottom: 8,
+              gap: 16,
             }}
           >
-            {/* QR Code */}
-            <div
-              style={{
-                background: "#FFFFFF",
-                borderRadius: 16,
-                padding: 14,
-                boxShadow:
-                  "0 0 0 1px rgba(245,158,11,0.2), 0 12px 40px rgba(0,0,0,0.5)",
-              }}
-            >
-              <img
-                src={QR_URL}
-                alt="UPI QR Code"
-                width={200}
-                height={200}
-                style={{ display: "block", borderRadius: 6 }}
-              />
+            {/* Amount */}
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#5A6E85",
+                  fontWeight: 600,
+                  marginBottom: 4,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                Amount to Pay
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                <span
+                  style={{
+                    fontSize: 38,
+                    fontWeight: 800,
+                    color: "#F59E0B",
+                    letterSpacing: "-1.5px",
+                    fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+                  }}
+                >
+                  {selectedPlan.price}
+                </span>
+                <span style={{ fontSize: 13, color: "#4A5B6E" }}>
+                  {selectedPlan.per}
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: "#3D4F63", marginTop: 3 }}>
+                {selectedPlan.note}
+              </div>
             </div>
 
-            {/* UPI ID copyable pill */}
+            {/* UPI ID */}
             <div
               style={{
                 display: "flex",
@@ -535,11 +289,12 @@ export default function PaywallModal({
             >
               <span
                 style={{
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#F59E0B",
                   fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                   letterSpacing: "0.02em",
+                  flex: 1,
                 }}
               >
                 {UPI_ID}
@@ -560,27 +315,12 @@ export default function PaywallModal({
                   cursor: "pointer",
                   color: "#F59E0B",
                   transition: "background 0.15s",
+                  flexShrink: 0,
                 }}
               >
                 <Copy size={13} />
               </button>
             </div>
-
-            {/* Amount note */}
-            <p
-              style={{
-                fontSize: 13,
-                color: "#5A6E85",
-                textAlign: "center",
-                lineHeight: 1.5,
-              }}
-            >
-              Pay{" "}
-              <span style={{ color: "#D1D9E6", fontWeight: 600 }}>₹2,499</span>{" "}
-              / month or{" "}
-              <span style={{ color: "#D1D9E6", fontWeight: 600 }}>₹830</span> /
-              week
-            </p>
 
             {/* Steps */}
             <div
@@ -588,87 +328,112 @@ export default function PaywallModal({
                 background: "rgba(255,255,255,0.025)",
                 border: "1px solid rgba(255,255,255,0.06)",
                 borderRadius: 12,
-                padding: "14px 18px",
-                maxWidth: 420,
-                width: "100%",
+                padding: "12px 16px",
               }}
             >
               <p
                 style={{
                   fontSize: 12,
                   color: "#5A6E85",
-                  lineHeight: 1.7,
+                  lineHeight: 1.8,
                   margin: 0,
-                  textAlign: "center",
                 }}
               >
-                <span style={{ color: "#7B8FA0" }}>1.</span> Open any UPI app
-                (GPay, PhonePe, Paytm){" "}
+                <span style={{ color: "#7B8FA0", fontWeight: 600 }}>1.</span>{" "}
+                Open GPay, PhonePe, or Paytm{" "}
                 <span
-                  style={{
-                    color: "rgba(245,158,11,0.5)",
-                    margin: "0 4px",
-                  }}
+                  style={{ color: "rgba(245,158,11,0.5)", margin: "0 3px" }}
                 >
                   →
                 </span>{" "}
-                <span style={{ color: "#7B8FA0" }}>2.</span> Scan QR or enter
-                UPI ID{" "}
+                <span style={{ color: "#7B8FA0", fontWeight: 600 }}>2.</span>{" "}
+                Scan QR or enter UPI ID{" "}
                 <span
-                  style={{
-                    color: "rgba(245,158,11,0.5)",
-                    margin: "0 4px",
-                  }}
+                  style={{ color: "rgba(245,158,11,0.5)", margin: "0 3px" }}
                 >
                   →
                 </span>{" "}
-                <span style={{ color: "#7B8FA0" }}>3.</span> Enter amount & pay{" "}
+                <span style={{ color: "#7B8FA0", fontWeight: 600 }}>3.</span>{" "}
+                Pay{" "}
+                <span style={{ color: "#D1D9E6", fontWeight: 600 }}>
+                  {selectedPlan.price}
+                </span>{" "}
                 <span
-                  style={{
-                    color: "rgba(245,158,11,0.5)",
-                    margin: "0 4px",
-                  }}
+                  style={{ color: "rgba(245,158,11,0.5)", margin: "0 3px" }}
                 >
                   →
                 </span>{" "}
-                <span style={{ color: "#7B8FA0" }}>4.</span> Send screenshot to
-                support to activate
+                <span style={{ color: "#7B8FA0", fontWeight: 600 }}>4.</span>{" "}
+                Send screenshot to support
               </p>
             </div>
 
-            {/* Gold note */}
-            <div
+            {/* Features */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              {FEATURES.slice(0, 5).map((feat) => (
+                <div
+                  key={feat}
+                  style={{ display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  <div
+                    style={{
+                      width: 15,
+                      height: 15,
+                      borderRadius: "50%",
+                      background: "rgba(245,158,11,0.12)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Check size={8} style={{ color: "#F59E0B" }} />
+                  </div>
+                  <span
+                    style={{ fontSize: 12, color: "#4A5B6E", lineHeight: 1.3 }}
+                  >
+                    {feat}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <button
+              type="button"
+              data-ocid="paywall.subscribe_button"
+              onClick={() => handleSubscribe(selectedPlan.id)}
+              className="btn-gold"
               style={{
+                width: "100%",
+                padding: "13px 0",
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: "pointer",
+                letterSpacing: "0.02em",
+                border: "none",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: 8,
-                background: "rgba(245,158,11,0.06)",
-                border: "1px solid rgba(245,158,11,0.2)",
-                borderRadius: 10,
-                padding: "10px 16px",
-                maxWidth: 420,
-                width: "100%",
               }}
             >
-              <span style={{ fontSize: 16 }}>✦</span>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "#F59E0B",
-                  margin: 0,
-                  fontWeight: 600,
-                  lineHeight: 1.4,
-                }}
-              >
-                After payment, contact us to activate your account
-              </p>
-            </div>
+              ✦ Subscribe {selectedPlan.label}
+            </button>
+          </div>
+        </motion.div>
 
-            <p style={{ fontSize: 11, color: "#2A3547", margin: 0 }}>
-              🔒 Manual verification · Instant activation on confirmation
-            </p>
-          </motion.div>
-        )}
+        <p
+          style={{
+            fontSize: 11,
+            color: "#2A3547",
+            marginTop: 20,
+            textAlign: "center",
+          }}
+        >
+          🔒 Manual verification · Instant activation on payment confirmation
+        </p>
       </motion.div>
     </div>
   );
